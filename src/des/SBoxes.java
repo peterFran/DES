@@ -9,7 +9,7 @@ package des;
  * @author petermeckiffe
  */
 public class SBoxes {
-    int[][][] sboxes = {{{14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
+    final int[][][] sboxes = {{{14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
                 {0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8},
                 {4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0},
                 {15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13}},
@@ -43,7 +43,25 @@ public class SBoxes {
                 {2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11}}};
 
     
-    public int[][] GetSBox(int box){
+    private int[][] getSBox(int box){
         return sboxes[box];
+    }
+    public String doSboxes(String block){
+        String result = "";
+        for(int i = 0;i<8;i++){
+            
+            int[][] sbox = this.getSBox(i);
+            String zeros = "0000";
+            String boxIn = block.substring(i*6, i*6+6);
+            String yAxisStr = boxIn.substring(0,1)+ boxIn.substring(5,6);
+            
+            int yAxis = Integer.parseInt(yAxisStr, 2);
+            int xAxis = Integer.parseInt(boxIn.substring(1, 5), 2);
+            
+            String endBin = Integer.toBinaryString(sbox[yAxis][xAxis]);
+            endBin = zeros.substring(endBin.length())+ endBin;
+            result += endBin;
+        }
+        return result;
     }
 }

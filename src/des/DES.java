@@ -28,11 +28,14 @@ public class DES {
         String r0 = m0.substring(32, 64);
         String a1 = perm.expansionPermutation(r0);
         
-        System.out.println();
+        String xored = DES.get48XOR(a1, nKey);
+        System.out.println(xored);
 
     }
     public static String get48XOR(String block, String key){
         String result="";
+        System.out.println(block);
+        System.out.println(key);
         char[] keyItems = block.toCharArray();
         char[] blockItems = key.toCharArray();
         for(int i = 0;i<48;i++){

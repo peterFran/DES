@@ -10,7 +10,7 @@ package des;
  */
 public class BitwiseOps {
     public static char XOR(char partA, char partB){
-        if(partA == partB){
+        if(partA != partB){
             return '1';
         }
         else{

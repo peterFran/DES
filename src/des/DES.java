@@ -31,5 +31,14 @@ public class DES {
         System.out.println();
 
     }
-    
+    public static String get48XOR(String block, String key){
+        String result="";
+        char[] keyItems = block.toCharArray();
+        char[] blockItems = key.toCharArray();
+        for(int i = 0;i<48;i++){
+            result += BitwiseOps.XOR(blockItems[i], keyItems[i]);
+        }
+        
+        return result;
+    }
 }

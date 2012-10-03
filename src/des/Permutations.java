@@ -34,7 +34,9 @@ public class Permutations {
         41, 52, 31, 37, 47, 55, 30, 40, 51, 45, 33, 48,
         44, 49, 39, 56, 34, 53, 46, 42, 50, 36, 29, 32};
     final int[] shiftQ = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};
-
+    
+    
+    // EACH PERMUTATION USES FOR EACH AND CONCAT'S A STRING TO PRODUCE OUTPUT
     public String initialPermutation(String block) {
         String resultString = "";
         for (int i : InitialPermutation) {
@@ -82,6 +84,9 @@ public class Permutations {
         return resultString;
     }
 
+    // Using prespecified shift quantity (shiftQ) for each round,
+    // leftshift splits input in two, shifts each side by that amount,
+    // and returns the result
     public String leftShift(String key, int round) {
         String result = "";
         result += key.substring(this.shiftQ[round], 28);

@@ -21,19 +21,7 @@ public class DES {
         String key = "1010101111001101111011110001001000110100010101101010101100010010";
         String block = "1010101111001101000100100011010011011100101110100100001100100001";
         DES des = new DES();
-        System.out.println(des.doDEA(key, block));
-//        String[] keys = des.getKeyTable(key);
-//        block = des.perm.initialPermutation(block);
-//        String leftHalf = block.substring(0, 32);
-//        String rightHalf = block.substring(32);
-        //System.out.println(DES.getXOR(des.f(keys[0], rightHalf), leftHalf));
-//        String afterExp = des.perm.expansionPermutation(rightHalf);
-//        String afterXOR=DES.getXOR(afterExp, keys[0]);
-//        String afterSBox = des.sboxes.doSboxes(afterXOR);
-//        String afterFinalPerm = des.perm.finalPermutation(afterSBox);
-//        String afterXORLeftHalf = DES.getXOR(leftHalf, afterFinalPerm);
-        //System.out.println(des.perm.leftShift(permKey.substring(28), 0));
-        //System.out.println(des.getHex(des.doDEARound(keyA, block.substring(32, 64))));
+        System.out.println(BitwiseOps.getHex(des.doDEA(key, block)));
     }
 
     public DES() {
@@ -41,61 +29,61 @@ public class DES {
         this.sboxes = new SBoxes();
     }
 
-    public static String getXOR(String block, String key) {
-        String result = "";
-        char[] keyItems = block.toCharArray();
-        char[] blockItems = key.toCharArray();
-        for (int i = 0; i < keyItems.length; i++) {
-            result += BitwiseOps.XOR(blockItems[i], keyItems[i]);
-        }
-        return result;
-    }
-
     public String doDEA(String key, String block) {
-
+        // Get the key table
         String[] keys = this.getKeyTable(key);
+        // Perform IP on entire block
         block = this.perm.initialPermutation(block);
-        String leftHalf = block.substring(0, 32);
-        String rightHalf = block.substring(32);
+        
+        // Divide block in two
+        String left = block.substring(0, 32);
+        String right = block.substring(32);
+        
+        // Process 16 rounds
         for (int i = 0; i < 16; i++) {
-            String leftHalfTemp = leftHalf;
-            leftHalf = DES.getXOR(this.f(keys[i], rightHalf), leftHalf);
-            rightHalf = leftHalfTemp;
-            System.out.println(this.getHex(leftHalf) + " " + this.getHex(rightHalf));
+            String leftTemp = left;
+            left = BitwiseOps.getXOR(this.f(keys[i], right), left);
+            right = leftTemp;
+            System.out.println(BitwiseOps.getHex(left) + " " + BitwiseOps.getHex(right));
         }
-        //String encryption = this.perm.antiInitialPermutation(rightHalf+leftHalf);
-        //System.out.println(encryption);
-        return "a";//encryption;
+        // Switch sides and do final permutation
+        String encryption = this.perm.antiInitialPermutation(right+left);
+        System.out.println(encryption);
+        return encryption;
     }
 
-    public String f(String key, String rightHalf) {
-        String afterExp = this.perm.expansionPermutation(rightHalf);
-        String afterXOR = DES.getXOR(afterExp, key);
-        String afterSBox = this.sboxes.doSboxes(afterXOR);
-        String afterFinalPerm = this.perm.finalPermutation(afterSBox);
-        return afterFinalPerm;
+    public String f(String key, String right) {
+        
+        // Expand Ri to 48 bits
+        String eRight = this.perm.expansionPermutation(right);
+        // XOR expanded bits with the key Ki
+        String B = BitwiseOps.getXOR(eRight, key);
+        // Send the result from the XOR through the s-boxes 
+        // In order to bring it back down to 32 bits
+        String C = this.sboxes.s(B);
+        // Perform the final permutation and return the result
+        return this.perm.finalPermutation(C);
     }
 
-    public void getBinary(String hex) {
-        String bin = Long.toBinaryString(Long.parseLong(hex, 16));
-        System.out.println(bin);
-    }
-
-    public String getHex(String bin) {
-        return Long.toHexString(Long.parseLong(bin, 2));
-    }
+    
 
     public String[] getKeyTable(String key) {
+        // Permutate key
         key = perm.keyPermutationA(key);
-        String keyC;
-        String keyD;
+        
+        // Create array for results and divide key
         String[] resultTable = new String[16];
-        keyC = key.substring(0, 28);
-        keyD = key.substring(28);
+        String keyC = key.substring(0, 28);
+        String keyD = key.substring(28);
+        
+        // Cycle over keys 16 times
         for (int i = 0; i < 16; i++) {
+            // Shift each side left by the required amount each round
             keyC = this.perm.leftShift(keyC, i);
             keyD = this.perm.leftShift(keyD, i);
+            // Add the new key to the result table
             resultTable[i] = this.perm.keyPermutationB(keyC + keyD);
+            System.out.println(BitwiseOps.getHex(resultTable[i]));
         }
         return resultTable;
     }

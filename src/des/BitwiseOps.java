@@ -17,4 +17,38 @@ public class BitwiseOps {
             return '0';
         }
     }
+    public static String getHexToBinary(String hex) {
+        // Get binary representation of hex Number
+        String bin = Long.toBinaryString(Long.parseLong(hex, 16));
+        
+        // Find amoutn of padding required
+        int diff = hex.length()*4-bin.length();
+        // Pad binary number with required 0's
+        for(int i = 0; i<diff;i++){
+            bin = "0"+bin;
+        }
+        return bin;
+    }
+    
+    public static String getIntToBinary(int integer){
+        return BitwiseOps.getHexToBinary(Long.toHexString(integer));
+        
+    }
+
+    public static String getHex(String bin) {
+        return Long.toHexString(Long.parseLong(bin, 2));
+    }
+    
+    public static String getXOR(String block, String key) {
+        String result = "";
+        // Get char arrays for easy comparison
+        char[] keyItems = block.toCharArray();
+        char[] blockItems = key.toCharArray();
+        
+        // Cycle over chars and XOR each one
+        for (int i = 0; i < keyItems.length; i++) {
+            result += BitwiseOps.XOR(blockItems[i], keyItems[i]);
+        }
+        return result;
+    }
 }

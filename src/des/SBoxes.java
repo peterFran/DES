@@ -43,23 +43,21 @@ public class SBoxes {
                 {2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11}}};
 
     
-    private int[][] getSBox(int box){
-        return sboxes[box];
-    }
-    public String doSboxes(String block){
+    public String s(String block){
         String result = "";
         for(int i = 0;i<8;i++){
-            
-            int[][] sbox = this.getSBox(i);
-            String zeros = "0000";
+            // Create substring from block containing input for sbox
             String boxIn = block.substring(i*6, i*6+6);
+            
+            // Create a String with bits for yAxis
             String yAxisStr = boxIn.substring(0,1)+ boxIn.substring(5,6);
             
+            // Get integer values for x & y axis
             int yAxis = Integer.parseInt(yAxisStr, 2);
             int xAxis = Integer.parseInt(boxIn.substring(1, 5), 2);
             
-            String endBin = Integer.toBinaryString(sbox[yAxis][xAxis]);
-            endBin = zeros.substring(endBin.length())+ endBin;
+            // Get binary using method which includes padding
+            String endBin = BitwiseOps.getIntToBinary(this.sboxes[i][yAxis][xAxis]);
             result += endBin;
         }
         return result;

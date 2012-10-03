@@ -39,21 +39,21 @@ public class DES {
         String[] keys = this.getKeyTable(key);
         // Perform IP on entire block
         block = this.perm.initialPermutation(block);
-        System.out.println("IP: "+BitwiseOps.getHex(block));
         // Divide block in two
         String left = block.substring(0, 32);
         String right = block.substring(32);
         System.out.println("Rounds:");
+        System.out.println("Round 0: "+BitwiseOps.getHex(left) + " " + BitwiseOps.getHex(right));
         // Process 16 rounds
         for (int i = 0; i < 16; i++) {
-            String leftTemp = left;
-            left = BitwiseOps.getXOR(this.f(keys[i], right), left);
-            right = leftTemp;
-            System.out.println("Round "+Integer.toString(i+1)+": "+left + " " + right);
+            String rightTemp = right;
+            right = BitwiseOps.getXOR(this.f(keys[i], right), left);
+            left = rightTemp;
+            System.out.println("Round "+Integer.toString(i+1)+": "+BitwiseOps.getHex(left) + " " + BitwiseOps.getHex(right));
         }
         System.out.println("");
         // Switch sides and do final permutation
-        String encryption = this.perm.antiInitialPermutation(left+right);
+        String encryption = this.perm.antiInitialPermutation(right+left);
         return encryption;
     }
 
@@ -80,9 +80,6 @@ public class DES {
         String[] resultTable = new String[16];
         String keyC = key.substring(0, 28);
         String keyD = key.substring(28);
-        System.out.println("KEY A: "+key);
-        System.out.println("KEY A HEX: "+BitwiseOps.getHex(key));
-        System.out.println("Keys:");
         // Cycle over keys 16 times
         for (int i = 0; i < 16; i++) {
             // Shift each side left by the required amount each round
@@ -91,7 +88,6 @@ public class DES {
             
             // Add the new key to the result table
             resultTable[i] = this.perm.keyPermutationB(keyC + keyD);
-            System.out.println("K"+Integer.toString(i+1)+": \n"+BitwiseOps.getHex(resultTable[i])+"\n"+keyC +" "+ keyD);
         }
         System.out.println("");
         return resultTable;

@@ -36,7 +36,19 @@ public class BitwiseOps {
     }
 
     public static String getHex(String bin) {
-        return Long.toHexString(Long.parseLong(bin, 2));
+        int mod = bin.length()%4;
+        // Pad binary if not already padded
+        for(int i = 0;i<mod;i++){
+            bin = "0"+bin;
+        }
+        // Get hex string and required padding for hex
+        String hex = Long.toHexString(Long.parseLong(bin, 2));
+        int diff = bin.length()/4-hex.length();
+        // Pad binary number with required 0's
+        for(int i = 0; i<diff;i++){
+            hex = "0"+hex;
+        }
+        return hex;
     }
     
     public static String getXOR(String block, String key) {

@@ -21,7 +21,12 @@ public class DES {
         String key = "1010101111001101111011110001001000110100010101101010101100010010";
         String block = "1010101111001101000100100011010011011100101110100100001100100001";
         DES des = new DES();
-        System.out.println(BitwiseOps.getHex(des.doDEA(key, block)));
+        String result = des.doDEA(key, block);
+        String partA = result.substring(0, result.length()/2);
+        String partB = result.substring(result.length()/2);
+        System.out.println("Encrypted Forms:");
+        System.out.println("Encrypted Binary: "+ partA+" "+partB);
+        System.out.println("Encrypted Hex: "+BitwiseOps.getHex(partA)+" "+BitwiseOps.getHex(partB));
     }
 
     public DES() {
@@ -38,17 +43,17 @@ public class DES {
         // Divide block in two
         String left = block.substring(0, 32);
         String right = block.substring(32);
-        
+        System.out.println("Rounds:");
         // Process 16 rounds
         for (int i = 0; i < 16; i++) {
             String leftTemp = left;
             left = BitwiseOps.getXOR(this.f(keys[i], right), left);
             right = leftTemp;
-            System.out.println(BitwiseOps.getHex(left) + " " + BitwiseOps.getHex(right));
+            System.out.println("Round "+Integer.toString(i+1)+": "+BitwiseOps.getHex(left) + " " + BitwiseOps.getHex(right));
         }
+        System.out.println("");
         // Switch sides and do final permutation
-        String encryption = this.perm.antiInitialPermutation(right+left);
-        System.out.println(encryption);
+        String encryption = this.perm.antiInitialPermutation(left+right);
         return encryption;
     }
 
@@ -76,6 +81,7 @@ public class DES {
         String keyC = key.substring(0, 28);
         String keyD = key.substring(28);
         
+        System.out.println("Keys:");
         // Cycle over keys 16 times
         for (int i = 0; i < 16; i++) {
             // Shift each side left by the required amount each round
@@ -83,8 +89,9 @@ public class DES {
             keyD = this.perm.leftShift(keyD, i);
             // Add the new key to the result table
             resultTable[i] = this.perm.keyPermutationB(keyC + keyD);
-            System.out.println(BitwiseOps.getHex(resultTable[i]));
+            System.out.println("K"+Integer.toString(i+1)+": "+BitwiseOps.getHex(resultTable[i]));
         }
+        System.out.println("");
         return resultTable;
     }
 }

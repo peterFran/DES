@@ -21,12 +21,19 @@ public class DES {
         String key = "1010101111001101111011110001001000110100010101101010101100010010";
         String block = "1010101111001101000100100011010011011100101110100100001100100001";
         DES des = new DES();
-        String result = des.doDEA(key, block);
-        String partA = result.substring(0, result.length()/2);
-        String partB = result.substring(result.length()/2);
-        System.out.println("Encrypted Forms:");
-        System.out.println("Encrypted Binary: "+ partA+" "+partB);
-        System.out.println("Encrypted Hex: "+BitwiseOps.getHex(partA)+" "+BitwiseOps.getHex(partB));
+        String encrypted = des.encrypt(key, block);
+        String decrypted = des.decrypt(key, encrypted);
+        String encryptA = encrypted.substring(0, encrypted.length()/2);
+        String encryptB = encrypted.substring(encrypted.length()/2);
+        String decryptA = decrypted.substring(0, decrypted.length()/2);
+        String decryptB = decrypted.substring(decrypted.length()/2);
+        
+        String blockA = block.substring(0, encrypted.length()/2);
+        String blockB = block.substring(block.length()/2);
+        
+        System.out.println("Start   Block: "+BitwiseOps.getHex(blockA)+" "+BitwiseOps.getHex(blockB));
+        System.out.println("Encrypted Hex: "+BitwiseOps.getHex(encryptA)+" "+BitwiseOps.getHex(encryptB));
+        System.out.println("Decrypted Hex: "+BitwiseOps.getHex(decryptA)+" "+BitwiseOps.getHex(decryptB));
     }
 
     public DES() {
@@ -34,11 +41,12 @@ public class DES {
         this.sboxes = new SBoxes();
     }
 
-    public String doDEA(String key, String block) {
+    public String encrypt(String key, String block) {
         // Get the key table
         String[] keys = this.getKeyTable(key);
         // Perform IP on entire block
         block = this.perm.initialPermutation(block);
+        
         // Divide block in two
         String left = block.substring(0, 32);
         String right = block.substring(32);
@@ -51,7 +59,28 @@ public class DES {
             left = rightTemp;
             System.out.println("Round "+Integer.toString(i+1)+": "+BitwiseOps.getHex(left) + " " + BitwiseOps.getHex(right));
         }
-        System.out.println("");
+        // Switch sides and do final permutation
+        String encryption = this.perm.antiInitialPermutation(right+left);
+        return encryption;
+    }
+    public String decrypt(String key, String block) {
+        // Get the key table
+        String[] keys = this.getKeyTable(key);
+        // Perform IP on entire block
+        block = this.perm.initialPermutation(block);
+        
+        // Divide block in two
+        String left = block.substring(0, 32);
+        String right = block.substring(32);
+        System.out.println("Rounds:");
+        System.out.println("Round 16: "+BitwiseOps.getHex(left) + " " + BitwiseOps.getHex(right));
+        // Process 16 rounds
+        for (int i = 15; i > -1; i--) {
+            String rightTemp = right;
+            right = BitwiseOps.getXOR(this.f(keys[i], right), left);
+            left = rightTemp;
+            System.out.println("Round "+Integer.toString(i)+": "+BitwiseOps.getHex(left) + " " + BitwiseOps.getHex(right));
+        }
         // Switch sides and do final permutation
         String encryption = this.perm.antiInitialPermutation(right+left);
         return encryption;
